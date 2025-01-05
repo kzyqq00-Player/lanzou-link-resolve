@@ -1,6 +1,6 @@
 {
   "name": "lanzou-link-resolve",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "让我们把蓝奏云直链解析变ez",
   "main": "dist/index.js",
   "types": "index.d.ts",
