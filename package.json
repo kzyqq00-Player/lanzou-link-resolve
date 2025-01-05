@@ -17,7 +17,7 @@
     "cloud"
   ],
   "author": "kzyqq00-Player",
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.10.5"
