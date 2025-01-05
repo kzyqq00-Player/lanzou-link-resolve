@@ -19,7 +19,6 @@ class LinkResolveError extends Error {
 }
 var LinkResolveErrorCodes;
 (function (LinkResolveErrorCodes) {
-    LinkResolveErrorCodes[LinkResolveErrorCodes["WITHOUT_PASSWORD_UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION"] = -3] = "WITHOUT_PASSWORD_UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION";
     LinkResolveErrorCodes[LinkResolveErrorCodes["WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED"] = -2] = "WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED";
     LinkResolveErrorCodes[LinkResolveErrorCodes["UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION"] = -1] = "UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION";
     LinkResolveErrorCodes[LinkResolveErrorCodes["PASSWORD_REQUIRED"] = 1] = "PASSWORD_REQUIRED";
@@ -28,7 +27,7 @@ var LinkResolveErrorCodes;
     LinkResolveErrorCodes[LinkResolveErrorCodes["FILE_UNSHARED"] = 3.1] = "FILE_UNSHARED";
 })(LinkResolveErrorCodes || (exports.LinkResolveErrorCodes = LinkResolveErrorCodes = {}));
 function getBytesFromFilesizeString(filesize) {
-    filesize = filesize.replace(/\s+/, '');
+    filesize = filesize.replace(/\s+/g, '');
     const num = parseFloat(filesize.slice(0, -1));
     const unit = filesize.slice(-1).toUpperCase();
     switch (unit) {
@@ -37,7 +36,7 @@ function getBytesFromFilesizeString(filesize) {
         case 'M': return Math.floor(num * 1024 * 1024);
         case 'G': return Math.floor(num * 1024 * 1024 * 1024);
         case 'T': return Math.floor(num * 1024 * 1024 * 1024 * 1024);
-        default: throw new Error('你确定蓝奏云能存这么大文件?');
+        default: throw new TypeError('你确定蓝奏云能存这么大文件?');
     }
 }
 class LanzouStringTransmissionFormat {
@@ -60,10 +59,9 @@ class LanzouStringTransmissionFormat {
             throw new TypeError('Invalid string');
         }
         const obj = {};
-        str.split('&').forEach(param => {
-            const [key, value] = param.split('=').map(decodeURIComponent);
-            const parsedValue = Number.isNaN(Number(value)) ? value : Number(value);
-            obj[key] = parsedValue;
+        str.split('&').forEach(pair => {
+            const [key, value] = pair.split('=');
+            obj[key] = Number.isNaN(Number(value)) ? value : Number(value);
         });
         return obj;
     }
@@ -83,15 +81,13 @@ function getAjaxmPHPHeaders(referer) {
         connection: 'keep-alive'
     };
 }
-function createAjaxmPHPBodyGetter(obj) {
-    return function () {
-        try {
-            return LanzouStringTransmissionFormat.stringify(obj);
-        }
-        catch (e) {
-            throw new LinkResolveError('LanzouStringTransmissionFormat.stringify failed', LinkResolveErrorCodes.WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED, e);
-        }
-    };
+function createAjaxmPHPBody(body) {
+    try {
+        return LanzouStringTransmissionFormat.stringify(body);
+    }
+    catch (e) {
+        throw new LinkResolveError('LanzouStringTransmissionFormat.stringify failed', LinkResolveErrorCodes.WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED, e);
+    }
 }
 class LinkResolver {
     constructor(options) {
@@ -103,21 +99,11 @@ class LinkResolver {
     }
     async resolve() {
         const pageURL = new node_url_1.URL(this.options.url.pathname, 'https://www.lanzoup.com');
-        const result = new Proxy({
+        const result = {
             downURL: new node_url_1.URL('http://example.org'),
             filename: '',
             filesize: 0
-        }, {
-            set(obj, prop, val, receiver) {
-                if (prop === 'downURL' && typeof val === 'string') {
-                    return Reflect.set(obj, prop, new node_url_1.URL(val), receiver);
-                }
-                else {
-                    // @ts-expect-error
-                    return Reflect.set(...arguments);
-                }
-            }
-        });
+        };
         const html = await (await fetch(pageURL, {
             headers: {
                 accept: exports.accept,
@@ -150,12 +136,12 @@ class LinkResolver {
                 ?? filesizeFromMetaDescription);
             const resp = await (await fetch(`https://www.lanzoup.com/ajaxm.php${html.match(/'*ajaxm.php(.*?)'/)[1]}`, {
                 headers: getAjaxmPHPHeaders(pageURL),
-                body: createAjaxmPHPBodyGetter({
+                body: createAjaxmPHPBody({
                     action: 'downprocess',
                     sign: html.match(/skdklds = '(.*?)'/)[1],
                     p: this.options.password,
-                    kd: html.match(/kdns =(.*?)/)[1]
-                })(),
+                    kd: html.match(/kdns =(.*?)/)[1] ?? 0
+                }),
                 method: 'POST'
             })).json();
             if (resp.zt) {
@@ -167,7 +153,7 @@ class LinkResolver {
                     throw new LinkResolveError('Password incorrect', LinkResolveErrorCodes.PASSWORD_INCORRECT);
                 }
                 else {
-                    throw new LinkResolveError('Unknwon ajaxm.php response exception', LinkResolveErrorCodes.UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION, resp);
+                    throw new LinkResolveError('Unknown ajaxm.php response exception', LinkResolveErrorCodes.UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION, resp);
                 }
             }
         }
@@ -189,7 +175,7 @@ class LinkResolver {
             this.iframeWindow = new jsdom_1.JSDOM(iframeHTML).window;
             const resp = await (await fetch(`https://www.lanzoup.com/ajaxm.php${iframeHTML.match(/'*ajaxm.php(.*?)'/)[1]}`, {
                 headers: getAjaxmPHPHeaders(iframeURL),
-                body: createAjaxmPHPBodyGetter({
+                body: createAjaxmPHPBody({
                     action: 'downprocess',
                     signs: iframeHTML.match(/ajaxdata = '(.*?)'/)[1],
                     sign: iframeHTML.match(/'sign':'(.*?)'/)[1],
@@ -197,7 +183,7 @@ class LinkResolver {
                     websignkey: iframeHTML.match(/aihidcms = '(.*?)'/)[1],
                     ves: iframeHTML.match(/'ves':(.*?),/)[1],
                     kd: iframeHTML.match(/kdns =(.*?)/)?.[1] ?? 0
-                })(),
+                }),
                 method: 'POST'
             })).json();
             if (resp.zt) {
@@ -205,7 +191,7 @@ class LinkResolver {
                 result.filename = resp.inf;
             }
             else {
-                throw new LinkResolveError('Unknwon ajaxm.php response exception', LinkResolveErrorCodes.UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION, resp);
+                throw new LinkResolveError('Unknown ajaxm.php response exception', LinkResolveErrorCodes.UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION, resp);
             }
         }
         return result;
