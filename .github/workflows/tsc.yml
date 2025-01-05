@@ -19,3 +19,10 @@ jobs:
         - run: npm i
         - run: npm i -g typescript
         - run: tsc
+        - name: Apply changes
+          run: |
+            git config --global user.name "Github Action"
+            git config --global user.email "actions@github.com"
+            git add .
+            git commit -m "TypeScript auto-compile"
+            git push
