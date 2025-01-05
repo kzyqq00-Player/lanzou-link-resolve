@@ -7,6 +7,10 @@
   "scripts": {
     "test": "node ./test.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kzyqq00-Player/lanzou-link-resolve.git"
+  },
   "keywords": [
     "lanzou",
     "link",
