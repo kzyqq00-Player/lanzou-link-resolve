@@ -1,0 +1,28 @@
+{
+  "name": "lanzou-link-resolve",
+  "version": "0.0.1",
+  "description": "自动化蓝奏云直链解析",
+  "main": "dist/index.js",
+  "types": "index.d.ts",
+  "scripts": {},
+  "keywords": [
+    "lanzou",
+    "link",
+    "resolve",
+    "auto",
+    "lib",
+    "file",
+    "share",
+    "drive",
+    "cloud"
+  ],
+  "author": "kzyqq00-Player",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^22.10.5"
+  },
+  "dependencies": {
+    "jsdom": "^25.0.1"
+  }
+}
