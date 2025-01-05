@@ -1,7 +1,7 @@
 {
   "name": "lanzou-link-resolve",
   "version": "0.0.1",
-  "description": "自动化蓝奏云直链解析",
+  "description": "让我们把蓝奏云直链解析变ez",
   "main": "dist/index.js",
   "types": "index.d.ts",
   "scripts": {},
