@@ -1,3 +1,5 @@
 src/
 /.github/
 /.vscode/
+.gitattributes
+tsconfig.json
