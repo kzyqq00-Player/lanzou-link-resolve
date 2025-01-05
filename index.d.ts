@@ -12,6 +12,17 @@ declare module 'lanzou-link-resolve' {
      */
     export const acceptLanguage: string;
 
+    /**
+     * 主类
+     */
+    export class LinkResolver {
+        constructor(options: ResolveOptions);
+
+        /**
+         * 进行解析。注意: 在构造时不会自动解析
+         */
+        public resolve(): Promise<ResolveResult>;
+    }
 
     export interface ResolveOptions {
         /**
@@ -29,8 +40,6 @@ declare module 'lanzou-link-resolve' {
 
     /**
      * 解析结果
-     * 
-     * 注意: 无法获取的值将会是`undefined`, 请在自己的程序中进行处理(例如: 重试/提醒用户)。
      */
     export interface ResolveResult {
         /**
@@ -40,7 +49,7 @@ declare module 'lanzou-link-resolve' {
         /**
          * 文件名
          */
-        filename?: string;
+        filename: string;
         /**
          * 文件大小, 以字节为单位
          */
@@ -69,7 +78,7 @@ declare module 'lanzou-link-resolve' {
      */
     export interface AjaxmPHPResponse {
         /**
-         * 可能代表是否成功
+         * 是否成功
          */
         zt: 0 | 1;
         /**
@@ -77,12 +86,32 @@ declare module 'lanzou-link-resolve' {
          */
         dom: string;
         /**
-         * `<dom>/file/?xxx`的`xxx`位置的值
+         * `<dom>/file/xxx`的`xxx`位置的值
          */
         url: 0 | string;
         /**
          * 文件名, 失败则为失败信息
          */
         inf: string;
+    }
+
+    /**
+     * 用于处理蓝奏云类JSON(以下称为蓝奏文本)传输中的转换
+     */
+    export class LanzouStringTransmissionFormat {
+        /**
+         * 是否是有效的蓝奏文本
+         */
+        public static isValid(str: string): boolean;
+
+        /**
+         * 将蓝奏文本转换回对象。如果不是有效的蓝奏文本, 将抛出`TypeError`
+         */
+        public static parse(str: string): object;
+
+        /**
+         * 将目标对象序列化为蓝奏文本
+         */
+        public static stringify(obj: { [s: string]: string | number }): string;
     }
 }
