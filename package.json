@@ -4,7 +4,9 @@
   "description": "让我们把蓝奏云直链解析变ez",
   "main": "dist/index.js",
   "types": "index.d.ts",
-  "scripts": {},
+  "scripts": {
+    "test": "node ./test.js"
+  },
   "keywords": [
     "lanzou",
     "link",
