@@ -226,6 +226,6 @@ export class LinkResolver {
                 throw new LinkResolveError('Unknown ajaxm.php response exception', LinkResolveErrorCodes.UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION, resp);
             }
         }
-        return result;
+        return result; 
     }
 }
