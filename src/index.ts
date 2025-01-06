@@ -22,6 +22,8 @@ class LinkResolveError extends Error {
 }
 
 export enum LinkResolveErrorCodes {
+    MISSING_CONTENT_LENGTH = -4,
+    URL_OF_AJAXM_PHP_RESPONSE_NOT_REDIRECTED = -3,
     WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED = -2,
     UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION = -1,
     PASSWORD_REQUIRED = 1,
@@ -30,19 +32,39 @@ export enum LinkResolveErrorCodes {
     FILE_UNSHARED = 3.1,
 }
 
-export function getBytesFromFilesizeString(filesize: string) {
-    filesize = filesize.replace(/\s+/g, '');
-    const num = parseFloat(filesize.slice(0, -1));
-    const unit = filesize.slice(-1).toUpperCase();
-
-    switch (unit) {
-        case 'B': return Math.floor(num);
-        case 'K': return Math.floor(num * 1024);
-        case 'M': return Math.floor(num * 1024 * 1024);
-        case 'G': return Math.floor(num * 1024 * 1024 * 1024);
-        case 'T': return Math.floor(num * 1024 * 1024 * 1024 * 1024);
-        default: throw new TypeError('你确定蓝奏云能存这么大文件?');
-    }
+async function getFilesizeFromAjaxmPHPResponseURL(ajaxmPHPResponseURL: URL) {
+    return await fetch(ajaxmPHPResponseURL, {
+        headers: {
+            'user-agent': userAgent,
+            accept,
+            'accept-encoding': 'gzip',
+            // ↓在排除了一切header后，最不可能的就是答案↓
+            'accept-language': acceptLanguage,
+            connection: 'keep-alive',
+        },
+        method: 'HEAD',
+        redirect: 'manual'
+    })
+        .then(resp => {
+            if (resp.headers.has('location')) {
+                return fetch(resp.headers.get('location'), {
+                    headers: {
+                        'user-agent': userAgent,
+                        'accept-encoding': 'gzip',
+                        connection: 'keep-alive'
+                    },
+                });
+            } else {
+                throw new LinkResolveError("ajaxm.php response's url not redirected", LinkResolveErrorCodes.URL_OF_AJAXM_PHP_RESPONSE_NOT_REDIRECTED, resp);
+            }
+        })
+        .then(resp => {
+            if (resp.headers.has('content-length')) {
+                return Number(resp.headers.get('content-length'));
+            } else {
+                throw new LinkResolveError("???'s response missing Content-Length header", LinkResolveErrorCodes.MISSING_CONTENT_LENGTH, resp);
+            }
+        });
 }
 
 export class LanzouStringTransmissionFormat {
@@ -122,6 +144,7 @@ export class LinkResolver {
             filename: '',
             filesize: 0
         };
+        Object.setPrototypeOf(result, null);
         
         const html = await (await fetch(pageURL, {
             headers: {
@@ -146,17 +169,16 @@ export class LinkResolver {
             }
         }
 
-        // const filenameFromTitle = this.window.document.title.slice(0, -6);
-        const filesizeFromMetaDescription = (this.window.document.querySelector('meta[name="description"]') as HTMLMetaElement)?.content?.slice?.(5);
-        if (this.window.document.querySelector('#pwd')) {
+        const hasPassword = Boolean(this.window.document.querySelector('#pwd'));
+        const filenameFromTitle = hasPassword
+            ? this.window.document.title
+            : this.window.document.title.slice(0, -6);
+        // const filesizeFromMetaDescription = (this.window.document.querySelector('meta[name="description"]') as HTMLMetaElement)?.content?.slice?.(5);
+        if (hasPassword) {
             if (isEmpty(this.options.password)) {
                 throw new LinkResolveError('Password required', LinkResolveErrorCodes.PASSWORD_REQUIRED);
             }
 
-            result.filesize = getBytesFromFilesizeString(
-                this.window.document.querySelector('.n_filesize')?.textContent?.slice?.(3)
-                ?? filesizeFromMetaDescription
-            );
             const resp: types.AjaxmPHPResponse = await (await fetch(
                 `https://www.lanzoup.com/ajaxm.php${html.match(/'*ajaxm.php(.*?)'/)[1]}`, 
                 { // 我不知道正常网站请求后面的`?file=xxx`是干嘛的, 同行好像也没加; 但是我为了保险还是加了
@@ -167,11 +189,14 @@ export class LinkResolver {
                         p: this.options.password,
                         kd: html.match(/kdns =(.*?)/)[1] ?? 0
                     }),
-                    method: 'POST'
+                    method: 'POST',
+                    redirect: 'manual'
                 })).json();
+
             if (resp.zt) {
                 result.downURL = new URL('/file/' + resp.url, resp.dom);
                 result.filename = resp.inf;
+                result.filesize = await getFilesizeFromAjaxmPHPResponseURL(result.downURL);
             } else {
                 if (resp.inf === '密码不正确') {
                     throw new LinkResolveError('Password incorrect', LinkResolveErrorCodes.PASSWORD_INCORRECT);
@@ -221,7 +246,8 @@ export class LinkResolver {
                 })).json();
             if (resp.zt) {
                 result.downURL = new URL('/file/' + resp.url, resp.dom);
-                result.filename = resp.inf;
+                result.filename = filenameFromTitle;
+                result.filesize = await getFilesizeFromAjaxmPHPResponseURL(result.downURL);
             } else {
                 throw new LinkResolveError('Unknown ajaxm.php response exception', LinkResolveErrorCodes.UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION, resp);
             }
