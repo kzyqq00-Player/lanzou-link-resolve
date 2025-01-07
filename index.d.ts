@@ -33,6 +33,10 @@ declare module 'lanzou-link-resolve' {
          * 文件分享密码, 如无可忽略
          */
         password?: string;
+        /**
+         * 是否自动重定向到最终地址
+         * @default false
+         */
         redirectedURL?: boolean;
     }
     export interface ProcessedResolveOptions extends ResolveOptions {

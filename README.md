@@ -4,11 +4,17 @@
 
 感谢前车之鉴: [hanximeng/LanzouAPI](https://github.com/hanximeng/LanzouAPI)
 
+## 待办事项
+- [ ] 解析文件夹直链
+
 ## 使用实例
 
-比如解析一个`https://lanzout.com/iifcz2jwtkmf`: 
+比如解析一个`https://lanzout.com/iifcz2jwtkmf`:
+
 ```typescript
-import { LinkResolver } from "lanzou-link-resolve";
+// noinspection JSAnnotator
+
+import {LinkResolver} from "lanzou-link-resolve";
 
 const resolver = new LinkResolver({
     url: 'https://lanzout.com/iifcz2jwtkmf',
@@ -19,7 +25,7 @@ const result = await resolver.resolve();
 console.log(result);
 ```
 输出类似
-```typescript
+```
 {
     downURL: URL {
         href: 'https://developer-oss.lanrar.com/file/?xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=',
