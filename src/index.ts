@@ -200,8 +200,7 @@ export class LinkResolver {
                         p: this.options.password,
                         kd: html.match(/kdns =(.*?)/)?.[1] ?? 0
                     }),
-                    method: 'POST',
-                    redirect: 'manual'
+                    method: 'POST'
                 })).json();
 
             if (resp.zt) {
