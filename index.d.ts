@@ -62,7 +62,8 @@ declare module 'lanzou-link-resolve' {
      * 注意: 内部错误通常代表已经失效了, 请提交issue并附带错误信息
      */
     export enum LinkResolveErrorCodes {
-        WITHOUT_PASSWORD_UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION = -3,
+        MISSING_CONTENT_LENGTH = -4,
+        URL_OF_AJAXM_PHP_RESPONSE_NOT_REDIRECTED = -3,
         WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED = -2,
         UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION = -1,
         PASSWORD_REQUIRED = 1,
