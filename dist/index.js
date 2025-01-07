@@ -178,8 +178,7 @@ class LinkResolver {
                     p: this.options.password,
                     kd: html.match(/kdns =(.*?)/)?.[1] ?? 0
                 }),
-                method: 'POST',
-                redirect: 'manual'
+                method: 'POST'
             })).json();
             if (resp.zt) {
                 result.downURL = new node_url_1.URL('/file/' + resp.url, resp.dom);
