@@ -24,6 +24,22 @@ declare module 'lanzou-link-resolve' {
         public resolve(): Promise<ResolveResult>;
     }
 
+    /**
+     * 在解析时主动抛出的错误
+     */
+    class LinkResolveError extends Error {
+        private constructor(message?: string, code?: LinkResolveErrorCodes, data?: any);
+
+        public data?: any;
+        public code?: number;
+    }
+
+    /**
+     * 判断值是否是`LinkResolveError`
+     * @see LinkResolveError
+     */
+    export function isLinkResolveError(val: any): val is LinkResolveError;
+
     export interface ResolveOptions {
         /**
          * 蓝奏云原始下载url, 例如`https://xxx.lanzouu.com/123456789123`
