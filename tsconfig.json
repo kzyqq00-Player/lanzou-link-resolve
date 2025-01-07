@@ -5,6 +5,7 @@
         // "declaration": true,
         "rootDir": "src",
         "outDir": "dist",
-        "strictBindCallApply": true
+        "strictBindCallApply": true,
+        "noEmitOnError": true
     }
 }

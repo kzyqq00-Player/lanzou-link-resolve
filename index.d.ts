@@ -33,6 +33,7 @@ declare module 'lanzou-link-resolve' {
          * 文件分享密码, 如无可忽略
          */
         password?: string;
+        redirectedURL?: boolean;
     }
     export interface ProcessedResolveOptions extends ResolveOptions {
         url: URL;
@@ -91,9 +92,11 @@ declare module 'lanzou-link-resolve' {
          */
         url: 0 | string;
         /**
-         * 文件名, 失败则为失败信息
+         * 有密码的页面为文件名,
+         * 有/无密码如失败则为失败信息,
+         * 无密码成功则为`0`
          */
-        inf: string;
+        inf: 0 | string;
     }
 
     /**
