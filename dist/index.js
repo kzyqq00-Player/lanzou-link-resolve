@@ -27,7 +27,8 @@ var LinkResolveErrorCodes;
     LinkResolveErrorCodes[LinkResolveErrorCodes["UNKNOWN_PAGE_CLOSURE_REASON"] = 3] = "UNKNOWN_PAGE_CLOSURE_REASON";
     LinkResolveErrorCodes[LinkResolveErrorCodes["FILE_UNSHARED"] = 3.1] = "FILE_UNSHARED";
 })(LinkResolveErrorCodes || (exports.LinkResolveErrorCodes = LinkResolveErrorCodes = {}));
-async function getFilesizeFromAjaxmPHPResponseURL(ajaxmPHPResponseURL) {
+async function getFilesizeAndRedirectedURLFromAjaxmPHPResponseURL(ajaxmPHPResponseURL) {
+    let redirectedURL;
     return await fetch(ajaxmPHPResponseURL, {
         headers: {
             'user-agent': exports.userAgent,
@@ -42,7 +43,8 @@ async function getFilesizeFromAjaxmPHPResponseURL(ajaxmPHPResponseURL) {
     })
         .then(resp => {
         if (resp.headers.has('location')) {
-            return fetch(resp.headers.get('location'), {
+            redirectedURL = new node_url_1.URL(resp.headers.get('location'));
+            return fetch(redirectedURL, {
                 headers: {
                     'user-agent': exports.userAgent,
                     'accept-encoding': 'gzip',
@@ -56,7 +58,10 @@ async function getFilesizeFromAjaxmPHPResponseURL(ajaxmPHPResponseURL) {
     })
         .then(resp => {
         if (resp.headers.has('content-length')) {
-            return Number(resp.headers.get('content-length'));
+            return {
+                length: Number(resp.headers.get('content-length')),
+                redirectedURL,
+            };
         }
         else {
             throw new LinkResolveError("???'s response missing Content-Length header", LinkResolveErrorCodes.MISSING_CONTENT_LENGTH, resp);
@@ -139,9 +144,9 @@ class LinkResolver {
             },
             method: 'GET',
         })).text();
-        this.window = new jsdom_1.JSDOM(html).window;
+        this.document = new jsdom_1.JSDOM(html).window.document;
         // 页面关闭处理
-        const pageOffElement = this.window.document.querySelector('.off');
+        const pageOffElement = this.document.querySelector('.off');
         if (pageOffElement) {
             const msg = pageOffElement.lastChild.textContent;
             if (msg.includes('文件取消分享')) {
@@ -151,10 +156,10 @@ class LinkResolver {
                 throw new LinkResolveError('Unknown page closure reason', LinkResolveErrorCodes.UNKNOWN_PAGE_CLOSURE_REASON, msg);
             }
         }
-        const hasPassword = Boolean(this.window.document.querySelector('#pwd'));
+        const hasPassword = Boolean(this.document.querySelector('#pwd'));
         const filenameFromTitle = hasPassword
-            ? this.window.document.title
-            : this.window.document.title.slice(0, -6);
+            ? this.document.title
+            : this.document.title.slice(0, -6);
         // const filesizeFromMetaDescription = (this.window.document.querySelector('meta[name="description"]') as HTMLMetaElement)?.content?.slice?.(5);
         if (hasPassword) {
             if (isEmpty(this.options.password)) {
@@ -174,7 +179,11 @@ class LinkResolver {
             if (resp.zt) {
                 result.downURL = new node_url_1.URL('/file/' + resp.url, resp.dom);
                 result.filename = resp.inf;
-                result.filesize = await getFilesizeFromAjaxmPHPResponseURL(result.downURL);
+                const getFilesizeAndRedirectedURLXxxResult = await getFilesizeAndRedirectedURLFromAjaxmPHPResponseURL(result.downURL);
+                result.filesize = getFilesizeAndRedirectedURLXxxResult.length;
+                if (this.options.redirectedURL) {
+                    result.downURL = getFilesizeAndRedirectedURLXxxResult.redirectedURL;
+                }
             }
             else {
                 if (resp.inf === '密码不正确') {
@@ -189,7 +198,7 @@ class LinkResolver {
             if (!isEmpty(this.options.password)) {
                 console.warn('Password not needs');
             }
-            const iframeURL = new node_url_1.URL(this.window.document.querySelector('.ifr2').src, pageURL.origin);
+            const iframeURL = new node_url_1.URL(this.document.querySelector('.ifr2').src, pageURL.origin);
             const iframeHTML = await (await fetch(iframeURL, {
                 headers: {
                     accept: exports.accept,
@@ -200,7 +209,7 @@ class LinkResolver {
                 },
                 method: 'GET'
             })).text();
-            this.iframeWindow = new jsdom_1.JSDOM(iframeHTML).window;
+            // this.iframeDocument = new JSDOM(iframeHTML).window.document;
             const resp = await (await fetch(`https://www.lanzoup.com/ajaxm.php${iframeHTML.match(/'*ajaxm.php(.*?)'/)[1]}`, {
                 headers: getAjaxmPHPHeaders(iframeURL),
                 body: createAjaxmPHPBody({
@@ -217,7 +226,11 @@ class LinkResolver {
             if (resp.zt) {
                 result.downURL = new node_url_1.URL('/file/' + resp.url, resp.dom);
                 result.filename = filenameFromTitle;
-                result.filesize = await getFilesizeFromAjaxmPHPResponseURL(result.downURL);
+                const getFilesizeAndRedirectedURLXxxResult = await getFilesizeAndRedirectedURLFromAjaxmPHPResponseURL(result.downURL);
+                result.filesize = getFilesizeAndRedirectedURLXxxResult.length;
+                if (this.options.redirectedURL) {
+                    result.downURL = getFilesizeAndRedirectedURLXxxResult.redirectedURL;
+                }
             }
             else {
                 throw new LinkResolveError('Unknown ajaxm.php response exception', LinkResolveErrorCodes.UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION, resp);
