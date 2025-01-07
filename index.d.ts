@@ -35,10 +35,11 @@ declare module 'lanzou-link-resolve' {
         password?: string;
         /**
          * 是否自动重定向到最终地址
-         * @default false
+         * @default true
          */
         redirectedURL?: boolean;
     }
+
     export interface ProcessedResolveOptions extends ResolveOptions {
         url: URL;
     }
@@ -63,7 +64,7 @@ declare module 'lanzou-link-resolve' {
 
     /**
      * 正数代表参数错误, 反之代表内部错误
-     * 
+     *
      * 注意: 内部错误通常代表已经失效了, 请提交issue并附带错误信息
      */
     export enum LinkResolveErrorCodes {

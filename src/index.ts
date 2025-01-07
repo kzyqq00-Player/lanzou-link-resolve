@@ -139,6 +139,7 @@ export class LinkResolver {
             options.url = new URL(options.url);
         }
 
+        options.redirectedURL ??= true;
         this.options = Object.freeze(options) as Readonly<types.ProcessedResolveOptions>;
     }
 
