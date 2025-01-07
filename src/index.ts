@@ -7,7 +7,7 @@ export const accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,ima
 export const acceptLanguage = 'zh-CN,zh;q=0.9';
 
 function isEmpty(val: any) {
-    return val === '' || val === null || val === undefined || Object.keys(val).length === 0 ;
+    return val === '' || val === null || val === undefined || Object.keys(val).length === 0;
 }
 
 class LinkResolveError extends Error {
@@ -32,7 +32,7 @@ export enum LinkResolveErrorCodes {
     FILE_UNSHARED = 3.1,
 }
 
-async function getFilesizeAndRedirectedURLFromAjaxmPHPResponseURL(ajaxmPHPResponseURL: URL) {
+async function getMoreInfoFromAjaxmPHPResponseURL(ajaxmPHPResponseURL: URL) {
     let redirectedURL: URL;
     return await fetch(ajaxmPHPResponseURL, {
         headers: {
@@ -65,6 +65,10 @@ async function getFilesizeAndRedirectedURLFromAjaxmPHPResponseURL(ajaxmPHPRespon
                 return {
                     length: Number(resp.headers.get('content-length')),
                     redirectedURL,
+                    filename: decodeURIComponent(
+                        resp.headers.get('content-disposition').match(/filename= (.*)/)?.[1]
+                        ?? resp.headers.get('content-disposition').match(/filename="(.*)"/)[1]
+                    )
                 }
             } else {
                 throw new LinkResolveError("???'s response missing Content-Length header", LinkResolveErrorCodes.MISSING_CONTENT_LENGTH, resp);
@@ -149,7 +153,7 @@ export class LinkResolver {
             filesize: 0
         };
         Object.setPrototypeOf(result, null);
-        
+
         const html = await (await fetch(pageURL, {
             headers: {
                 accept,
@@ -174,9 +178,11 @@ export class LinkResolver {
         }
 
         const hasPassword = Boolean(this.document.querySelector('#pwd'));
+        /*
         const filenameFromTitle = hasPassword
             ? this.document.title
             : this.document.title.slice(0, -6);
+        */
         // const filesizeFromMetaDescription = (this.window.document.querySelector('meta[name="description"]') as HTMLMetaElement)?.content?.slice?.(5);
         if (hasPassword) {
             if (isEmpty(this.options.password)) {
@@ -184,7 +190,7 @@ export class LinkResolver {
             }
 
             const resp: types.AjaxmPHPResponse = await (await fetch(
-                `https://www.lanzoup.com/ajaxm.php${html.match(/'*ajaxm.php(.*?)'/)[1]}`, 
+                `https://www.lanzoup.com/ajaxm.php${html.match(/'*ajaxm.php(.*?)'/)[1]}`,
                 { // 我不知道正常网站请求后面的`?file=xxx`是干嘛的, 同行好像也没加; 但是我为了保险还是加了
                     headers: getAjaxmPHPHeaders(pageURL),
                     body: createAjaxmPHPBody({
@@ -201,13 +207,12 @@ export class LinkResolver {
                 result.downURL = new URL('/file/' + resp.url, resp.dom);
                 result.filename = resp.inf as string;
 
-                const getFilesizeAndRedirectedURLXxxResult =
-                    await getFilesizeAndRedirectedURLFromAjaxmPHPResponseURL(result.downURL);
+                const moreInfo = await getMoreInfoFromAjaxmPHPResponseURL(result.downURL);
 
-                result.filesize = getFilesizeAndRedirectedURLXxxResult.length;
+                result.filesize = moreInfo.length;
 
                 if (this.options.redirectedURL) {
-                    result.downURL = getFilesizeAndRedirectedURLXxxResult.redirectedURL;
+                    result.downURL = moreInfo.redirectedURL;
                 }
             } else {
                 if (resp.inf === '密码不正确') {
@@ -258,19 +263,20 @@ export class LinkResolver {
                 })).json();
             if (resp.zt) {
                 result.downURL = new URL('/file/' + resp.url, resp.dom);
-                result.filename = filenameFromTitle;
+                // result.filename = filenameFromTitle;
 
-                const getFilesizeAndRedirectedURLXxxResult =
-                    await getFilesizeAndRedirectedURLFromAjaxmPHPResponseURL(result.downURL);
-                result.filesize = getFilesizeAndRedirectedURLXxxResult.length;
+                const moreInfo =
+                    await getMoreInfoFromAjaxmPHPResponseURL(result.downURL);
+                result.filesize = moreInfo.length;
+                result.filename = moreInfo.filename;
 
                 if (this.options.redirectedURL) {
-                    result.downURL = getFilesizeAndRedirectedURLXxxResult.redirectedURL;
+                    result.downURL = moreInfo.redirectedURL;
                 }
             } else {
                 throw new LinkResolveError('Unknown ajaxm.php response exception', LinkResolveErrorCodes.UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION, resp);
             }
         }
-        return result; 
+        return result;
     }
 }

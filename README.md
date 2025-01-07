@@ -14,7 +14,7 @@
 ```typescript
 // noinspection JSAnnotator
 
-import {LinkResolver} from "lanzou-link-resolve";
+import { LinkResolver } from "lanzou-link-resolve";
 
 const resolver = new LinkResolver({
     url: 'https://lanzout.com/iifcz2jwtkmf',
