@@ -27,7 +27,7 @@ var LinkResolveErrorCodes;
     LinkResolveErrorCodes[LinkResolveErrorCodes["UNKNOWN_PAGE_CLOSURE_REASON"] = 3] = "UNKNOWN_PAGE_CLOSURE_REASON";
     LinkResolveErrorCodes[LinkResolveErrorCodes["FILE_UNSHARED"] = 3.1] = "FILE_UNSHARED";
 })(LinkResolveErrorCodes || (exports.LinkResolveErrorCodes = LinkResolveErrorCodes = {}));
-async function getFilesizeAndRedirectedURLFromAjaxmPHPResponseURL(ajaxmPHPResponseURL) {
+async function getMoreInfoFromAjaxmPHPResponseURL(ajaxmPHPResponseURL) {
     let redirectedURL;
     return await fetch(ajaxmPHPResponseURL, {
         headers: {
@@ -61,6 +61,8 @@ async function getFilesizeAndRedirectedURLFromAjaxmPHPResponseURL(ajaxmPHPRespon
             return {
                 length: Number(resp.headers.get('content-length')),
                 redirectedURL,
+                filename: decodeURIComponent(resp.headers.get('content-disposition').match(/filename= (.*)/)?.[1]
+                    ?? resp.headers.get('content-disposition').match(/filename="(.*)"/)[1])
             };
         }
         else {
@@ -157,9 +159,11 @@ class LinkResolver {
             }
         }
         const hasPassword = Boolean(this.document.querySelector('#pwd'));
+        /*
         const filenameFromTitle = hasPassword
             ? this.document.title
             : this.document.title.slice(0, -6);
+        */
         // const filesizeFromMetaDescription = (this.window.document.querySelector('meta[name="description"]') as HTMLMetaElement)?.content?.slice?.(5);
         if (hasPassword) {
             if (isEmpty(this.options.password)) {
@@ -179,10 +183,10 @@ class LinkResolver {
             if (resp.zt) {
                 result.downURL = new node_url_1.URL('/file/' + resp.url, resp.dom);
                 result.filename = resp.inf;
-                const getFilesizeAndRedirectedURLXxxResult = await getFilesizeAndRedirectedURLFromAjaxmPHPResponseURL(result.downURL);
-                result.filesize = getFilesizeAndRedirectedURLXxxResult.length;
+                const moreInfo = await getMoreInfoFromAjaxmPHPResponseURL(result.downURL);
+                result.filesize = moreInfo.length;
                 if (this.options.redirectedURL) {
-                    result.downURL = getFilesizeAndRedirectedURLXxxResult.redirectedURL;
+                    result.downURL = moreInfo.redirectedURL;
                 }
             }
             else {
@@ -225,11 +229,12 @@ class LinkResolver {
             })).json();
             if (resp.zt) {
                 result.downURL = new node_url_1.URL('/file/' + resp.url, resp.dom);
-                result.filename = filenameFromTitle;
-                const getFilesizeAndRedirectedURLXxxResult = await getFilesizeAndRedirectedURLFromAjaxmPHPResponseURL(result.downURL);
-                result.filesize = getFilesizeAndRedirectedURLXxxResult.length;
+                // result.filename = filenameFromTitle;
+                const moreInfo = await getMoreInfoFromAjaxmPHPResponseURL(result.downURL);
+                result.filesize = moreInfo.length;
+                result.filename = moreInfo.filename;
                 if (this.options.redirectedURL) {
-                    result.downURL = getFilesizeAndRedirectedURLXxxResult.redirectedURL;
+                    result.downURL = moreInfo.redirectedURL;
                 }
             }
             else {
