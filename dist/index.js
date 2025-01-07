@@ -126,6 +126,7 @@ class LinkResolver {
         if (typeof options.url === 'string') {
             options.url = new node_url_1.URL(options.url);
         }
+        options.redirectedURL ?? (options.redirectedURL = true);
         this.options = Object.freeze(options);
     }
     async resolve() {
