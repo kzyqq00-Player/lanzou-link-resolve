@@ -16,9 +16,12 @@ jobs:
         - uses: actions/setup-node@v4
           with:
             node-version: 20
-        - run: npm i
-        - run: npm i -g typescript
-        - run: tsc
+        - name: Install dependencies
+          run: |
+            npm i
+            npm i -g typescript
+        - name: Compile
+          run: tsc
         - name: Apply changes
           run: |
             git config --global user.name "Github Actions"
