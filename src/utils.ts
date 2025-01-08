@@ -32,7 +32,10 @@ export async function getMoreInfoFromAjaxmPHPResponseURL(ajaxmPHPResponseURL: UR
     })
         .then(resp => {
             if (resp.headers.has('location')) {
-                redirectedURL = new URL(resp.headers.get('location'));
+                const temp = new URL(resp.headers.get('location'));
+                temp.searchParams.delete('pid');
+                redirectedURL = temp;
+
                 return fetch(redirectedURL, {
                     headers: {
                         'user-agent': userAgent,
