@@ -73,10 +73,5 @@ function getAjaxmPHPHeaders(referer) {
     };
 }
 function createAjaxmPHPBody(body) {
-    try {
-        return new URLSearchParams(body).toString();
-    }
-    catch (e) {
-        throw new LinkResolveError('LanzouStringTransmissionFormat.stringify failed', index_1.LinkResolveErrorCodes.WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED, e);
-    }
+    return new URLSearchParams(body).toString();
 }
