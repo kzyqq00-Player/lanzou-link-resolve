@@ -7,9 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        ** 请预先搜索此问题是否在其他 issue 中出现过，重复的 issue 会被 close + lock。 **
-        ## yarn
-        本人不喜欢yarn。如果你想要迁移到yarn，你可以自行提交一个pr。
+        **请预先搜索此问题是否在其他 issue 中出现过，重复的 issue 会被 close + lock。**
         ## 功能建议
         如果你想要一个新功能，请到[功能请求](https://github.com/kzyqq00-Player/lanzou-link-resolve/issues/new?labels=enhancement&template=feature-request.yml)。
 
