@@ -1,0 +1,23 @@
+name: 功能请求
+description: 如果你想这个项目加一个功能，请点击此处。
+title: "[FEAT] "
+labels: [ enhancement ]
+body:
+  - type: textarea
+    attributes:
+      label: 简单描述
+      description: 简单描述一下你想要的功能。
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 附加描述
+      description: 你想要描述更多的东西就在这里描述吧！
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        如果你想自己提交一个PR来开发此功能，请不要提交issue，直接去[提交PR](https://github.com/kzyqq00-Player/lanzou-link-resolve/compare)。

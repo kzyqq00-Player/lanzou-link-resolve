@@ -1,0 +1,68 @@
+name: Bug报告
+description: 遇到Bug请在这里报告。
+title: "[BUG] "
+labels: [ bug ]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ** 请预先搜索此问题是否在其他 issue 中出现过，重复的 issue 会被 close + lock。 **
+        ## yarn
+        本人不喜欢yarn。如果你想要迁移到yarn，你可以自行提交一个pr。
+        ## 功能建议
+        如果你想要一个新功能，请到[功能请求](https://github.com/kzyqq00-Player/issues/new?labels=enhancement&template=feature-request.yml)。
+
+  - type: textarea
+    attributes:
+      label: 环境信息
+      description: Node.js版本
+      placeholder: |
+        - Node.js版本（如 22.10.0）：
+      value: |
+        - Node.js版本（如 22.10.0）：
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 当前代码
+      description: 当前的相关代码
+      placeholder: 把相关代码复制到这里
+      render: typescript
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: 问题描述
+      description: 如何重现，最好带有截图或视频以便排查。
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 预期行为
+      description: 你认为应该是什么行为。
+    validations:
+      required: false
+
+  - type: checkboxes
+    attributes:
+      label: 最终确认
+      description: 请确认以下所有内容，否则将被 close。
+      options:
+        - label: 我确认此问题未在其他 issue 中出现过。
+          required: false
+        - label: 确认这些东西没有在 [待办事项](https://github.com/kzyqq00-Player/lanzou-link-resolve/blob/main/README.md#%E5%BE%85%E5%8A%9E%E4%BA%8B%E9%A1%B9) 里出现。
+          required: false
+        - label: 我确认我正在使用最新的 lanzou-link-resolver 版本。
+          required: false
+
+  - type: checkboxes
+    attributes:
+      label: 作出贡献？
+      description: 你可以自己提交一个PR来解决此问题。（如果你不知道这里在说什么，请勿勾选）
+      options:
+        - label: 我将自行提交一个 PR 来解决此问题。
+          required: false
