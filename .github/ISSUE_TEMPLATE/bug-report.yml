@@ -11,7 +11,7 @@ body:
         ## yarn
         本人不喜欢yarn。如果你想要迁移到yarn，你可以自行提交一个pr。
         ## 功能建议
-        如果你想要一个新功能，请到[功能请求](https://github.com/kzyqq00-Player/issues/new?labels=enhancement&template=feature-request.yml)。
+        如果你想要一个新功能，请到[功能请求](https://github.com/kzyqq00-Player/lanzou-link-resolve/issues/new?labels=enhancement&template=feature-request.yml)。
 
   - type: textarea
     attributes:
