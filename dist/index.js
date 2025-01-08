@@ -5,6 +5,7 @@ exports.isLinkResolveError = isLinkResolveError;
 const jsdom_1 = require("jsdom");
 const node_url_1 = require("node:url");
 const utils_1 = require("./utils");
+const types_1 = require("node:util/types");
 exports.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0';
 exports.accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7';
 exports.acceptLanguage = 'zh-CN,zh;q=0.9';
@@ -21,6 +22,9 @@ var LinkResolveErrorCodes;
 })(LinkResolveErrorCodes || (exports.LinkResolveErrorCodes = LinkResolveErrorCodes = {}));
 class LinkResolver {
     constructor(options) {
+        if ((0, types_1.isProxy)(options)) {
+            throw new TypeError('options cannot is a Proxy');
+        }
         Object.setPrototypeOf(options, null);
         if (typeof options.url === 'string') {
             options.url = new node_url_1.URL(options.url);
