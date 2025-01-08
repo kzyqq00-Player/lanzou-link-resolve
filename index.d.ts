@@ -86,6 +86,9 @@ declare module 'lanzou-link-resolve' {
     export enum LinkResolveErrorCodes {
         MISSING_CONTENT_LENGTH = -4,
         URL_OF_AJAXM_PHP_RESPONSE_NOT_REDIRECTED = -3,
+        /**
+         * @deprecated v0.1.7
+         */
         WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED = -2,
         UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION = -1,
         PASSWORD_REQUIRED = 1,

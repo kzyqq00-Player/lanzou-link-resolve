@@ -76,9 +76,5 @@ export function getAjaxmPHPHeaders(referer: URL) {
 type ConstructorParameters<T extends abstract new (...args: any[]) => any> = T extends abstract new (...args: infer P) => any ? P : never;
 
 export function createAjaxmPHPBody(body: ConstructorParameters<typeof URLSearchParams>[0]) {
-    try {
-        return new URLSearchParams(body).toString();
-    } catch (e) {
-        throw new LinkResolveError('LanzouStringTransmissionFormat.stringify failed', LinkResolveErrorCodes.WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED, e);
-    }
+    return new URLSearchParams(body).toString();
 }
