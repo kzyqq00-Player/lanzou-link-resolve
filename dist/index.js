@@ -75,7 +75,7 @@ class LinkResolver {
                     action: 'downprocess',
                     sign: html.match(/skdklds = '(.*?)'/)[1],
                     p: this.options.password,
-                    kd: html.match(/kdns =(.*?)/)?.[1] ?? 0
+                    kd: html.match(/kdns =(.*?)/)?.[1] ?? '0'
                 }),
                 method: 'POST'
             })).json();
@@ -122,7 +122,7 @@ class LinkResolver {
                     websign: iframeHTML.match(/ciucjdsdc = '(.*?)'/)[1],
                     websignkey: iframeHTML.match(/aihidcms = '(.*?)'/)[1],
                     ves: iframeHTML.match(/'ves':(.*?),/)[1],
-                    kd: iframeHTML.match(/kdns =(.*?)/)?.[1] ?? 0
+                    kd: iframeHTML.match(/kdns =(.*?)/)?.[1] ?? '0'
                 }),
                 method: 'POST'
             })).json();

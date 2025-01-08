@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LanzouStringTransmissionFormat = exports.LinkResolveError = void 0;
+exports.LinkResolveError = void 0;
 exports.isEmpty = isEmpty;
 exports.getMoreInfoFromAjaxmPHPResponseURL = getMoreInfoFromAjaxmPHPResponseURL;
 exports.getAjaxmPHPHeaders = getAjaxmPHPHeaders;
@@ -61,39 +61,6 @@ async function getMoreInfoFromAjaxmPHPResponseURL(ajaxmPHPResponseURL) {
         }
     });
 }
-class LanzouStringTransmissionFormat {
-    constructor() {
-        throw new TypeError('你构造一个这玩意干嘛');
-    }
-    static isValid(str) {
-        if (str === '')
-            return false;
-        const pairs = str.split('&');
-        for (const pair of pairs) {
-            const [key, value] = pair.split('=');
-            if (!key || !value)
-                return false;
-        }
-        return true;
-    }
-    static parse(str) {
-        if (!this.isValid(str)) {
-            throw new TypeError('Invalid string');
-        }
-        const obj = {};
-        str.split('&').forEach(pair => {
-            const [key, value] = pair.split('=');
-            obj[key] = Number.isNaN(Number(value)) ? value : Number(value);
-        });
-        return obj;
-    }
-    static stringify(obj) {
-        return Object.keys(obj)
-            .map(key => `${key}=${obj[key]}`)
-            .join('&');
-    }
-}
-exports.LanzouStringTransmissionFormat = LanzouStringTransmissionFormat;
 function getAjaxmPHPHeaders(referer) {
     return {
         "content-type": 'application/x-www-form-urlencoded',
@@ -105,7 +72,7 @@ function getAjaxmPHPHeaders(referer) {
 }
 function createAjaxmPHPBody(body) {
     try {
-        return LanzouStringTransmissionFormat.stringify(body);
+        return new URLSearchParams(body).toString();
     }
     catch (e) {
         throw new LinkResolveError('LanzouStringTransmissionFormat.stringify failed', index_1.LinkResolveErrorCodes.WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED, e);
