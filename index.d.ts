@@ -119,24 +119,4 @@ declare module 'lanzou-link-resolve' {
          */
         inf: 0 | string;
     }
-
-    /**
-     * 用于处理蓝奏云类JSON(以下称为蓝奏文本)传输中的转换
-     */
-    export class LanzouStringTransmissionFormat {
-        /**
-         * 是否是有效的蓝奏文本
-         */
-        public static isValid(str: string): boolean;
-
-        /**
-         * 将蓝奏文本转换回对象。如果不是有效的蓝奏文本, 将抛出`TypeError`
-         */
-        public static parse(str: string): object;
-
-        /**
-         * 将目标对象序列化为蓝奏文本
-         */
-        public static stringify(obj: { [s: string]: string | number }): string;
-    }
 }

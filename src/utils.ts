@@ -60,43 +60,6 @@ export async function getMoreInfoFromAjaxmPHPResponseURL(ajaxmPHPResponseURL: UR
         });
 }
 
-export class LanzouStringTransmissionFormat {
-    constructor() {
-        throw new TypeError('你构造一个这玩意干嘛');
-    }
-
-    public static isValid(str: string) {
-        if (str === '') return false;
-        const pairs = str.split('&');
-
-        for (const pair of pairs) {
-            const [key, value] = pair.split('=');
-            if (!key || !value) return false;
-        }
-
-        return true;
-    }
-
-    public static parse(str: string) {
-        if (!this.isValid(str)) {
-            throw new TypeError('Invalid string');
-        }
-
-        const obj = {};
-        str.split('&').forEach(pair => {
-            const [key, value] = pair.split('=');
-            obj[key] = Number.isNaN(Number(value)) ? value : Number(value);
-        });
-        return obj;
-    }
-
-    public static stringify(obj: { [s: string]: string | number }) {
-        return Object.keys(obj)
-            .map(key => `${key}=${obj[key]}`)
-            .join('&');
-    }
-}
-
 export function getAjaxmPHPHeaders(referer: URL) {
     return {
         "content-type": 'application/x-www-form-urlencoded',
@@ -107,9 +70,11 @@ export function getAjaxmPHPHeaders(referer: URL) {
     } as const;
 }
 
-export function createAjaxmPHPBody(body: Parameters<typeof LanzouStringTransmissionFormat['stringify']>[0]) {
+type ConstructorParameters<T extends abstract new (...args: any[]) => any> = T extends abstract new (...args: infer P) => any ? P : never;
+
+export function createAjaxmPHPBody(body: ConstructorParameters<typeof URLSearchParams>[0]) {
     try {
-        return LanzouStringTransmissionFormat.stringify(body);
+        return new URLSearchParams(body).toString();
     } catch (e) {
         throw new LinkResolveError('LanzouStringTransmissionFormat.stringify failed', LinkResolveErrorCodes.WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED, e);
     }
