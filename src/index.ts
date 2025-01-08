@@ -8,6 +8,7 @@ import {
     isEmpty,
     LinkResolveError
 } from "./utils";
+import {isProxy} from "node:util/types";
 
 export const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0';
 export const accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7';
@@ -26,6 +27,9 @@ export enum LinkResolveErrorCodes {
 
 export class LinkResolver {
     constructor(options: types.ResolveOptions) {
+        if (isProxy(options)) {
+            throw new TypeError('options cannot is a Proxy');
+        }
         Object.setPrototypeOf(options, null);
 
         if (typeof options.url === 'string') {
