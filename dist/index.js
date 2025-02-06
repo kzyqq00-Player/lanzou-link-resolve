@@ -13,7 +13,7 @@ var LinkResolveErrorCodes;
 (function (LinkResolveErrorCodes) {
     LinkResolveErrorCodes[LinkResolveErrorCodes["MISSING_CONTENT_LENGTH"] = -4] = "MISSING_CONTENT_LENGTH";
     LinkResolveErrorCodes[LinkResolveErrorCodes["URL_OF_AJAXM_PHP_RESPONSE_NOT_REDIRECTED"] = -3] = "URL_OF_AJAXM_PHP_RESPONSE_NOT_REDIRECTED";
-    LinkResolveErrorCodes[LinkResolveErrorCodes["WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED"] = -2] = "WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED";
+    // WITHOUT_PASSWORD_JSON_STRINGIFY_FAILED = -2,
     LinkResolveErrorCodes[LinkResolveErrorCodes["UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION"] = -1] = "UNKNOWN_AJAXM_PHP_RESPONSE_EXCEPTION";
     LinkResolveErrorCodes[LinkResolveErrorCodes["PASSWORD_REQUIRED"] = 1] = "PASSWORD_REQUIRED";
     LinkResolveErrorCodes[LinkResolveErrorCodes["PASSWORD_INCORRECT"] = 2] = "PASSWORD_INCORRECT";
